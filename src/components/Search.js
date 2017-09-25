@@ -2,7 +2,7 @@ import React from 'react';
 
 
 // eslint-disable-next-line 
-const urlUsername = username => 'https://api.github.com/users/';
+const urlUsername = username => 'https://api.github.com/users/usernmae';
 "https://maps.googleapis.com/maps/api/js?key=AIzaSyB3T-T-Y-G5pCPJsOaRQYjYwZFOCJ4toQA&libraries=places";
 
 class Search extends React.Component {
