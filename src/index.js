@@ -1,12 +1,3 @@
-
-// import registerServiceWorker from './registerServiceWorker';
-
-// import React from 'react'
-// import ReactDOM from 'react-dom';
-
-// import { render } from 'react-dom';
-
-// import App from './components/App';
 import 'babel-polyfill'
 
 import React from 'react'
