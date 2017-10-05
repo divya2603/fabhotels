@@ -1,106 +1,49 @@
-// export function increment(index) {
-//     return {
-//         type: 'INCREMENT_LIKES',
-//         index
-//     }
-// }
-
 import fetch from 'isomorphic-fetch'
 
-export const REQUEST_POSTS = 'REQUEST_POSTS'
-export const RECEIVE_POSTS = 'RECEIVE_POSTS'
-export const SELECT_SUBREDDIT = 'SELECT_SUBREDDIT'
-export const INVALIDATE_SUBREDDIT = 'INVALIDATE_SUBREDDIT'
-export const DISPLAY_APPDETAILS = 'DISPLAY_APPDETAILS'
+export const REQUEST_PLACES = 'REQUEST_PLACES'
+export const RECEIVE_PLACES = 'RECEIVE_PLACES'
 
-export function selectSubreddit(subreddit) {
+function requestPlaces(query) {
   return {
-    type: SELECT_SUBREDDIT,
-    subreddit
+    type: REQUEST_PLACES,
+    query
   }
 }
 
-/********action creator for fetching places*********/
-export function fetchPlaces(query) {
-  const request = fetchPosts(query).results
+function receivePlaces(query, json) {
   return {
-    type: 'FETCH_PLACES',
-    payload: request
+    type: RECEIVE_PLACES,
+    query,
+    places: json.data.children.map(child => child.data)
   }
 }
 
-export function invalidateSubreddit(subreddit) {
-  return {
-    type: INVALIDATE_SUBREDDIT,
-    subreddit
-  }
-}
-
-const displayAppDetails = () => ({
-  type: DISPLAY_APPDETAILS
-});
-
-function requestPosts(subreddit) {
-  return {
-    type: REQUEST_POSTS,
-    subreddit
-  }
-}
-
-function receivePosts(subreddit, json) {
-  return {
-    type: RECEIVE_POSTS,
-    subreddit,
-    posts: json.data.children.map(child => child.data)||{},
-    receivedAt: Date.now()
-  }
-}
-
-    const options = {
-      method: 'GET',
-      headers: {
-        'Access-Control-Allow-Origin': ' http://192.168.43.109:3000/',
-        'Content-Type': 'application/json; charset=utf-8',
-        'Accept': 'application/json',
-        
-
-      },
-      mode: 'no-cors', // allow cross-origin HTTP request
-      //credentials: 'same-origin' // This is similar to XHR’s withCredentials flag
-    };
-
-function fetchPosts(subreddit) {
-
+function fetchPlaces(query) {
   return dispatch => {
-    dispatch(requestPosts(subreddit))
-    return fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&rankby=distance&types=food&key=AIzaSyBwiGhJdpzxBoY_DbVp06JVnok0--x8sco`, options)
-      .then((response) => response )
-      .then((responseJson) => {if(responseJson.status != 0) {
-        dispatch(receivePosts(subreddit, responseJson))}
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    dispatch(requestPlaces(query))
+    return fetch(`https://www.reddit.com/r/${query}.json`)
+      .then(response => response.json())
+      .then(json => dispatch(receivePlaces(query, json)))
   }
 }
 
-function shouldFetchPosts(state, subreddit) {
-  const posts = state.postsBySubreddit[subreddit]
-  if (!posts) {
+function shouldFetchPlaces(state, query) {
+  const places = state.placesSearched//state.postsBySubreddit[subreddit]
+  console.log()
+  if (!places) {
     return true
-  } else if (posts.isFetching) {
+  } else if (places.isFetching) {
     return false
   } else {
-    return posts.didInvalidate
+    return places.didInvalidate
   }
 }
 
-export function fetchPostsIfNeeded(subreddit) {
+export function fetchPlacesIfNeeded(query) {
+  console.log(query)
   return (dispatch, getState) => {
-    if (shouldFetchPosts(getState(), subreddit)) {
-      return dispatch(fetchPosts(subreddit))
+    if (shouldFetchPlaces(getState(), query)) {
+      return dispatch(fetchPlaces(query))
     }
   }
 }
-
-export default displayAppDetails;

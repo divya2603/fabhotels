@@ -1,79 +1,49 @@
 import { combineReducers } from 'redux'
 import {
-  SELECT_SUBREDDIT,
-  INVALIDATE_SUBREDDIT,
-  REQUEST_POSTS,
-  RECEIVE_POSTS
+  REQUEST_PLACES,
+  RECEIVE_PLACES
 } from '../actions'
 
-function selectedSubreddit(state = 'reactjs', action) {
-  switch (action.type) {
-    case SELECT_SUBREDDIT:
-      return action.subreddit
-    default:
-      return state
-  }
-}
-/***********fetch places**************/
-const initialState = [];
-function getPlaces(state= initialState, action) {
-  switch(action.type) {
-    case 'FETCH_PLACES': {
-      console.log(action.type);return {...state};
-    }
-      
-    default:
-      return state;
 
-  }
-}
-function posts(
-  state = {
+/***********fetch places**************/
+const initialState = {
     isFetching: false,
     didInvalidate: false,
     items: []
-  },
-  action
-) {
-  switch (action.type) {
-    case INVALIDATE_SUBREDDIT:
-      return Object.assign({}, state, {
-        didInvalidate: true
-      })
-    case REQUEST_POSTS:
+  };
+function getPlaces(state= initialState, action) {
+  switch(action.type) {
+    case REQUEST_PLACES:
       return Object.assign({}, state, {
         isFetching: true,
         didInvalidate: false
       })
-    case RECEIVE_POSTS:
+      case RECEIVE_PLACES:
       return Object.assign({}, state, {
         isFetching: false,
         didInvalidate: false,
-        items: action.posts,
-        lastUpdated: action.receivedAt
+        items: action.places
       })
+
     default:
-      return state
-  }
+      return state;
+
+  } 
 }
 
-function postsBySubreddit(state = {}, action) {
+function placesSearched(state = initialState, action) {
   switch (action.type) {
-    case INVALIDATE_SUBREDDIT:
-    case RECEIVE_POSTS:
-    case REQUEST_POSTS:
+    case RECEIVE_PLACES:
+    case REQUEST_PLACES:
       return Object.assign({}, state, {
-        [action.subreddit]: posts(state[action.subreddit], action)
+        [action.places]: getPlaces(state[action.query], action)
       })
     default:
       return state
   }
 }
-
 const rootReducer = combineReducers({
-  postsBySubreddit,
-  selectedSubreddit,
-  getPlaces
+  placesSearched
 })
 
 export default rootReducer
