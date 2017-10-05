@@ -40,7 +40,6 @@ function shouldFetchPlaces(state, query) {
 }
 
 export function fetchPlacesIfNeeded(query) {
-  console.log(query)
   return (dispatch, getState) => {
     if (shouldFetchPlaces(getState(), query)) {
       return dispatch(fetchPlaces(query))
